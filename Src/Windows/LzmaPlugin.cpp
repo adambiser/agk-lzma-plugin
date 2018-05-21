@@ -318,18 +318,18 @@ If given a raw: path, it is returned as is.
 Otherwise an absolute path for the file within the write folder is returned.
 If allowReadPath is true, the read path is returned instead if the write path does not exist.
 */
-std::string GetArchiveFilePath(const char *archiveFilename, bool allowReadPath = true)
+std::string GetArchiveFilePath(const char *archiveFileName, bool allowReadPath = true)
 {
 	std::string archivePath;
-	if (strncmp(archiveFilename, "raw:", 4) == 0)
+	if (strncmp(archiveFileName, "raw:", 4) == 0)
 	{
-		archivePath.append(archiveFilename + 4);
+		archivePath.append(archiveFileName + 4);
 	}
 	else
 	{
 		archivePath.append(agk::GetWritePath());
 		archivePath.append(agk::GetFolder());
-		archivePath.append(archiveFilename);
+		archivePath.append(archiveFileName);
 		if (allowReadPath)
 		{
 			std::string testPath;
@@ -340,7 +340,7 @@ std::string GetArchiveFilePath(const char *archiveFilename, bool allowReadPath =
 				archivePath.clear();
 				archivePath.append(agk::GetReadPath());
 				archivePath.append(agk::GetFolder());
-				archivePath.append(archiveFilename);
+				archivePath.append(archiveFileName);
 			}
 		}
 	}
@@ -451,9 +451,9 @@ Opens an archive in read mode using the given password.  Password can be an empt
 
 Returns the archive ID or 0 if the archive failed to open.
 */
-extern "C" DLL_EXPORT int OpenToRead(const char *archiveFilename, const char *password)
+extern "C" DLL_EXPORT int OpenToRead(const char *archiveFileName, const char *password)
 {
-	std::string archivePath = GetArchiveFilePath(archiveFilename);
+	std::string archivePath = GetArchiveFilePath(archiveFileName);
 	CMyComPtr<IInArchive> archive = CreateArchiveReader();
 	if (!OpenArchiveReader(archive, archivePath.c_str(), password))
 	{
@@ -470,9 +470,9 @@ Note that this writes to a temporary file while placing a lock on any existing f
 
 Returns the archive ID or 0 if the archive failed to open.
 */
-extern "C" DLL_EXPORT int OpenToWrite(const char *archiveFilename, const char *password)
+extern "C" DLL_EXPORT int OpenToWrite(const char *archiveFileName, const char *password)
 {
-	std::string archivePath = GetArchiveFilePath(archiveFilename);
+	std::string archivePath = GetArchiveFilePath(archiveFileName);
 	// Open the archive for read if it exists.  If so, cache the item list.
 	CMyComPtr<IInArchive> archiveReader;
 	std::string testPath;
@@ -520,9 +520,9 @@ bool HadReportableFileError()
 Delete without raising an error.
 Reports true or false.
 */
-bool SafeDelete(const char *filename)
+bool SafeDelete(const char *fileName)
 {
-	if ((remove(filename) != 0) && HadReportableFileError())
+	if ((remove(fileName) != 0) && HadReportableFileError())
 	{
 		return false;
 	}
@@ -600,18 +600,18 @@ extern "C" DLL_EXPORT void Close(int archiveID)
 	if (info->writer != NULL)
 	{
 		//CloseWriter(info);
-		// Get the original filename and extension.
-		char filename[_MAX_FNAME];
+		// Get the original fileName and extension.
+		char fileName[_MAX_FNAME];
 		char ext[_MAX_EXT];
-		if (_splitpath_s(info->path.c_str(), NULL, 0, NULL, 0, filename, _MAX_FNAME, ext, _MAX_EXT) != 0)
+		if (_splitpath_s(info->path.c_str(), NULL, 0, NULL, 0, fileName, _MAX_FNAME, ext, _MAX_EXT) != 0)
 		{
-			ReportError("Could not split filename.");
+			ReportError("Could not split file path.");
 		}
 		else
 		{
 			// Create the temp file path.
 			std::string tempPath;
-			tempPath.append(agk::GetWritePath()).append(agk::GetFolder()).append(filename).append(ext).append(".tmp");
+			tempPath.append(agk::GetWritePath()).append(agk::GetFolder()).append(fileName).append(ext).append(".tmp");
 			// Create the archive.
 			COutFileStream *outFileStreamSpec = new COutFileStream;
 			CMyComPtr<IOutStream> outFileStream = outFileStreamSpec;
@@ -664,7 +664,7 @@ extern "C" DLL_EXPORT void Close(int archiveID)
 						}
 						else
 						{
-							destPath.append(agk::GetWritePath()).append(agk::GetFolder()).append(filename).append(ext);
+							destPath.append(agk::GetWritePath()).append(agk::GetFolder()).append(fileName).append(ext);
 						}
 						// Copy the temp file.
 						SafeRename(tempPath.c_str(), destPath.c_str());
@@ -711,7 +711,7 @@ extern "C" DLL_EXPORT char *GetFilePath(int archiveID)
 /*
 Sets the progress tween chain.
 A progress tween chain must have a duration of 100 and a delay of 0 to work properly.
-The tween chain is update while compressing and extracting.
+The tween chain is updated while compressing and extracting.
 */
 extern "C" DLL_EXPORT void SetProgressTweenChain(int tweenChainID)
 {
@@ -719,7 +719,7 @@ extern "C" DLL_EXPORT void SetProgressTweenChain(int tweenChainID)
 }
 
 /*
-Clear the list of tween chains that the plugin should update while compressing and extracting.
+Clears the list of tween chains that the plugin should update while compressing and extracting.
 */
 extern "C" DLL_EXPORT void ClearTweenChains()
 {
@@ -735,7 +735,7 @@ extern "C" DLL_EXPORT void AddTweenChain(int tweenChainID)
 }
 
 /*
-Clear the list of tween chains that the plugin should update and restart if they finish while compressing and extracting.
+Clears the list of tween chains that the plugin should update and restart if they finish while compressing and extracting.
 */
 extern "C" DLL_EXPORT void ClearRepeatingTweenChains()
 {
@@ -791,7 +791,6 @@ extern "C" DLL_EXPORT char *GetItemListJSON(int archiveID)
 
 /*
 Checks to see if the archive has an item with the given name.
-When the archive is open in write mode, only pre-existing items are checked.
 */
 extern "C" DLL_EXPORT int HasItem(int archiveID, char *itemName)
 {
@@ -859,7 +858,7 @@ The "raw:" prefix is supported.
 
 Returns a boolean indicating success.
 */
-extern "C" DLL_EXPORT int ExtractItemToFile(int archiveID, char *itemName, char *filename, int deleteOnExit)
+extern "C" DLL_EXPORT int ExtractItemToFile(int archiveID, char *itemName, char *fileName, int deleteOnExit)
 {
 	int memblock = GetItemAsMemblock(archiveID, itemName);
 	if (memblock == 0)
@@ -867,13 +866,13 @@ extern "C" DLL_EXPORT int ExtractItemToFile(int archiveID, char *itemName, char 
 		return 0;
 	}
 	agk::GetErrorOccurred(); // Clear any existing error.
-	agk::CreateFileFromMemblock(filename, memblock);
+	agk::CreateFileFromMemblock(fileName, memblock);
 	int hadError = agk::GetErrorOccurred();
 	agk::DeleteMemblock(memblock);
 	// Delete on exit.
 	if (deleteOnExit)
 	{
-		std::string extractPath = GetArchiveFilePath(filename, false);
+		std::string extractPath = GetArchiveFilePath(fileName, false);
 		if (extractPath.compare(0, 4, "raw:") == 0)
 		{
 			extractPath = extractPath.substr(4);
@@ -967,7 +966,7 @@ extern "C" DLL_EXPORT char *GetItemAsString(int archiveID, char *itemName)
 //}
 
 /*
-Completely clears all items from the archive.
+Removes all items from the archive.
 
 Returns a boolean indicating success.
 */
@@ -1071,9 +1070,9 @@ Sets an item from a file.
 
 Returns a boolean indicating success.
 */
-extern "C" DLL_EXPORT int SetItemFromFile(int archiveID, char *itemName, const char *filename)
+extern "C" DLL_EXPORT int SetItemFromFile(int archiveID, char *itemName, const char *fileName)
 {
-	unsigned int memblock = agk::CreateMemblockFromFile(filename);
+	unsigned int memblock = agk::CreateMemblockFromFile(fileName);
 	if (memblock == 0)
 	{
 		return 0;
@@ -1105,9 +1104,9 @@ Sets an item from an image file.
 
 Returns a boolean indicating success.
 */
-extern "C" DLL_EXPORT int SetItemFromImageFile(int archiveID, char *itemName, const char *filename)
+extern "C" DLL_EXPORT int SetItemFromImageFile(int archiveID, char *itemName, const char *fileName)
 {
-	unsigned int imageID = agk::LoadImage(filename);
+	unsigned int imageID = agk::LoadImage(fileName);
 	if (imageID == 0)
 	{
 		return 0;
@@ -1118,11 +1117,11 @@ extern "C" DLL_EXPORT int SetItemFromImageFile(int archiveID, char *itemName, co
 }
 
 /*
-Sets an item from a object mesh.
+Sets an item from an object mesh.
 
 Returns a boolean indicating success.
 */
-extern "C" DLL_EXPORT int SetItemFromObjectMesh(int archiveID, char *itemName, unsigned int objectID, unsigned int meshIndex)
+extern "C" DLL_EXPORT int SetItemFromObjectMesh(int archiveID, char *itemName, const unsigned int objectID, const unsigned int meshIndex)
 {
 	unsigned int memblock = agk::CreateMemblockFromObjectMesh(objectID, meshIndex);
 	if (memblock == 0)
@@ -1156,9 +1155,9 @@ Sets an item from a sound file.
 
 Returns a boolean indicating success.
 */
-extern "C" DLL_EXPORT int SetItemFromSoundFile(int archiveID, char *itemName, const char *filename)
+extern "C" DLL_EXPORT int SetItemFromSoundFile(int archiveID, char *itemName, const char *fileName)
 {
-	unsigned int soundID = agk::LoadSound(filename);
+	unsigned int soundID = agk::LoadSound(fileName);
 	if (soundID == 0)
 	{
 		return 0;
