@@ -141,7 +141,11 @@
     <ClInclude Include="..\AGKLibraryCommands.h" />
     <ClInclude Include="7zip.h" />
     <ClInclude Include="LzmaPlugin.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="StdAfx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="LzmaPlugin.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

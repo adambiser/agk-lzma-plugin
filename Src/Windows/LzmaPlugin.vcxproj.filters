@@ -112,6 +112,7 @@
     <ClInclude Include="..\LZMA SDK\C\Alloc.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Spec">
@@ -126,5 +127,8 @@
     <Filter Include="Windows">
       <UniqueIdentifier>{fcebbbd6-57d9-467a-bf1f-83d6b121e782}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="LzmaPlugin.rc" />
   </ItemGroup>
 </Project>

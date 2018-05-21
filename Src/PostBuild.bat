@@ -12,7 +12,7 @@ IF EXIST "UpdateAGKFolder.bat" (
 
 @ECHO Copy to each example project.
 FOR /D %%G in ("Examples\*") DO (
-	Copy "%1" "%%G\Plugins\SteamPlugin\Windows.dll"
+	Copy "%1" "%%G\Plugins\LzmaPlugin\Windows.dll"
 )
 goto :eof
 
