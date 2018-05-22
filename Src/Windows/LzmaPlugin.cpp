@@ -94,6 +94,19 @@ static FString CmdStringToFString(const char *s)
 	return us2fs(GetUnicodeString(s));
 }
 
+/*
+Attempts to detect when the game is running in debug mode by checking the read path.
+*/
+bool RunningInDebugMode()
+{
+	char *path = agk::GetReadPath();
+	for (char *p = path; *p != '\0'; p++)
+	{
+		*p = tolower(*p);
+	}
+	return (strstr(path, "/tier 1/compiler/interpreters/") != 0);
+}
+
 // String replace
 int replace(char *str, char ch1, char ch2)
 {
@@ -522,6 +535,10 @@ Reports true or false.
 */
 bool SafeDelete(const char *fileName)
 {
+	if ((fileName == NULL) || (strlen(fileName) == 0))
+	{
+		return false;
+	}
 	if ((remove(fileName) != 0) && HadReportableFileError())
 	{
 		return false;
@@ -546,23 +563,23 @@ bool SafeRename(const char *oldFileName, const char *newFileName)
 	backup.append(".bak");
 	if (!SafeDelete(backup.c_str()))
 	{
-		ReportErrorN("Failed to remove existing archive backup. Error", errno);
+		ReportErrorN("Failed to remove existing file backup. Error", errno);
 		return false;
 	}
 	if ((rename(newFileName, backup.c_str()) != 0) && HadReportableFileError())
 	{
-		ReportErrorN("Failed to backup original archive. Error", errno);
+		ReportErrorN("Failed to backup original file. Error", errno);
 		return false;
 	}
 	if (rename(oldFileName, newFileName) != 0)
 	{
-		ReportErrorN("Failed to rename archive file. Error", errno);
+		ReportErrorN("Failed to rename file. Error", errno);
 		return false;
 	}
 	if (!SafeDelete(backup.c_str()))
 	{
 		// This is a warning since the rename did take place.
-		ReportErrorN("Failed to remove archive backup. Error", errno);
+		ReportErrorN("Failed to remove file backup. Error", errno);
 	}
 	return true;
 }
@@ -690,6 +707,22 @@ extern "C" DLL_EXPORT void Close(int archiveID)
 		info->reader->Close();
 	}
 	info->Clear();
+}
+
+extern "C" DLL_EXPORT int MoveFileFromWritePathToReadPath(char *fileName)
+{
+	if (RunningInDebugMode())
+	{
+		agk::Message("This command does not work when running in debug mode.");
+		return 0;
+	}
+	std::string writePath = agk::GetWritePath();
+	writePath.append(agk::GetFolder());
+	writePath.append(fileName);
+	std::string readPath = agk::GetReadPath();
+	readPath.append(agk::GetFolder());
+	readPath.append(fileName);
+	return SafeRename(writePath.c_str(), readPath.c_str());
 }
 
 /*

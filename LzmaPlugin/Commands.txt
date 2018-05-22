@@ -31,3 +31,5 @@ ClearTweenChain,0,0,ClearTweenChain,0,0,0,0,0
 AddTweenChain,0,I,AddTweenChain,0,0,0,0,0
 ClearRepeatingTweenChains,0,0,ClearRepeatingTweenChains,0,0,0,0,0
 AddRepeatingTweenChain,0,I,AddRepeatingTweenChain,0,0,0,0,0
+#
+MoveFileFromWritePathToReadPath,I,S,MoveFileFromWritePathToReadPath,0,0,0,0,0

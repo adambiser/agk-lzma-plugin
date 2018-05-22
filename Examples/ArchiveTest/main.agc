@@ -151,6 +151,7 @@ Function WriteArchive(archiveName as string, password as string)
 		//~ AddMessage(archive.GetItemListJSON(archiveID))
 		archive.Close(archiveID)
 		AddMessage("Done")
+		AddMessage("Moving file to read path: " + str(archive.MoveFileFromWritePathToReadPath(archiveName)))
 	endif
 EndFunction
 
