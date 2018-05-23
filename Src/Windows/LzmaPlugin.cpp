@@ -104,7 +104,9 @@ bool RunningInDebugMode()
 	{
 		*p = tolower(*p);
 	}
-	return (strstr(path, "/tier 1/compiler/interpreters/") != 0);
+	bool result = (strstr(path, "/tier 1/compiler/interpreters/") != 0);
+	agk::DeleteString(path);
+	return result;
 }
 
 // String replace
@@ -152,6 +154,13 @@ Converts a std::string to agk:string.
 char *CreateString(std::string text)
 {
 	return CreateString(text.c_str());
+}
+
+// Append to std::string and delete the string return from an AGK command.
+void AppendAGKString(std::string &str, char *agkString)
+{
+	&str.append(agkString);
+	agk::DeleteString(agkString);
 }
 
 /*
@@ -340,8 +349,8 @@ std::string GetArchiveFilePath(const char *archiveFileName, bool allowReadPath =
 	}
 	else
 	{
-		archivePath.append(agk::GetWritePath());
-		archivePath.append(agk::GetFolder());
+		AppendAGKString(archivePath, agk::GetWritePath());
+		AppendAGKString(archivePath, agk::GetFolder());
 		archivePath.append(archiveFileName);
 		if (allowReadPath)
 		{
@@ -351,8 +360,8 @@ std::string GetArchiveFilePath(const char *archiveFileName, bool allowReadPath =
 			if (!agk::GetFileExists(testPath.c_str()))
 			{
 				archivePath.clear();
-				archivePath.append(agk::GetReadPath());
-				archivePath.append(agk::GetFolder());
+				AppendAGKString(archivePath, agk::GetReadPath());
+				AppendAGKString(archivePath, agk::GetFolder());
 				archivePath.append(archiveFileName);
 			}
 		}
@@ -628,7 +637,9 @@ extern "C" DLL_EXPORT void Close(int archiveID)
 		{
 			// Create the temp file path.
 			std::string tempPath;
-			tempPath.append(agk::GetWritePath()).append(agk::GetFolder()).append(fileName).append(ext).append(".tmp");
+			AppendAGKString(tempPath, agk::GetWritePath());
+			AppendAGKString(tempPath, agk::GetFolder()); 
+			tempPath.append(fileName).append(ext).append(".tmp");
 			// Create the archive.
 			COutFileStream *outFileStreamSpec = new COutFileStream;
 			CMyComPtr<IOutStream> outFileStream = outFileStreamSpec;
@@ -681,7 +692,9 @@ extern "C" DLL_EXPORT void Close(int archiveID)
 						}
 						else
 						{
-							destPath.append(agk::GetWritePath()).append(agk::GetFolder()).append(fileName).append(ext);
+							AppendAGKString(destPath, agk::GetWritePath());
+							AppendAGKString(destPath, agk::GetFolder());
+							destPath.append(fileName).append(ext);
 						}
 						// Copy the temp file.
 						SafeRename(tempPath.c_str(), destPath.c_str());
@@ -709,19 +722,39 @@ extern "C" DLL_EXPORT void Close(int archiveID)
 	info->Clear();
 }
 
-extern "C" DLL_EXPORT int MoveFileFromWritePathToReadPath(char *fileName)
+extern "C" DLL_EXPORT int MoveFileToReadPath(const char *fileName)
 {
 	if (RunningInDebugMode())
 	{
-		agk::Message("This command does not work when running in debug mode.");
+		agk::Message("This command does not work while running in debug mode.");
 		return 0;
 	}
-	std::string writePath = agk::GetWritePath();
-	writePath.append(agk::GetFolder());
-	writePath.append(fileName);
-	std::string readPath = agk::GetReadPath();
-	readPath.append(agk::GetFolder());
-	readPath.append(fileName);
+	std::string writePath = fileName;
+	std::string readPath;
+	AppendAGKString(readPath, agk::GetReadPath());
+	AppendAGKString(readPath, agk::GetFolder());
+	// Add support for the raw prefix.
+	if (writePath.compare(0, 4, "raw:") == 0)
+	{
+		writePath = writePath.substr(4);
+		char fname[_MAX_FNAME];
+		char ext[_MAX_EXT];
+		if (_splitpath_s(writePath.c_str(), NULL, 0, NULL, 0, fname, _MAX_FNAME, ext, _MAX_EXT) != 0)
+		{
+			ReportError("Could not split file path.");
+			return false;
+		}
+		readPath.append(fname);
+		readPath.append(ext);
+	}
+	else
+	{
+		writePath.clear();
+		AppendAGKString(writePath, agk::GetWritePath());
+		AppendAGKString(writePath, agk::GetFolder());
+		writePath.append(fileName);
+		readPath.append(fileName);
+	}
 	return SafeRename(writePath.c_str(), readPath.c_str());
 }
 

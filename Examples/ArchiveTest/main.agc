@@ -151,9 +151,13 @@ Function WriteArchive(archiveName as string, password as string)
 		//~ AddMessage(archive.GetItemListJSON(archiveID))
 		archive.Close(archiveID)
 		AddMessage("Done")
-		AddMessage("Moving file to read path: " + str(archive.MoveFileFromWritePathToReadPath(archiveName)))
+		AddMessage("Moving file to read path: " + str(archive.MoveFileToReadPath(archiveName)))
+		// raw: prefix also supported.
+		//~ AddMessage("Moving file to read path: " + str(archive.MoveFileToReadPath("raw:" + GetWritePath() + GetFolder() + archiveName)))
 	endif
 EndFunction
+
+log(GetWritePath() + GetFolder() + "out.7z")
 
 Function DeleteFromArchive(archiveName as string, password as string)
 	AddMessage("Writing to " + archiveName + ", password: '" + password + "'")

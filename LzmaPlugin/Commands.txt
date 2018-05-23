@@ -32,4 +32,4 @@ AddTweenChain,0,I,AddTweenChain,0,0,0,0,0
 ClearRepeatingTweenChains,0,0,ClearRepeatingTweenChains,0,0,0,0,0
 AddRepeatingTweenChain,0,I,AddRepeatingTweenChain,0,0,0,0,0
 #
-MoveFileFromWritePathToReadPath,I,S,MoveFileFromWritePathToReadPath,0,0,0,0,0
+MoveFileToReadPath,I,S,MoveFileToReadPath,0,0,0,0,0
