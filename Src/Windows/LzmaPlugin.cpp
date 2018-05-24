@@ -992,10 +992,10 @@ Currently both items are extracted as files into the write folder, the image is 
 
 Returns an image ID or 0.
 */
-extern "C" DLL_EXPORT int GetItemAsImageAtlas(int archiveID, char *itemName, char *subImagesItemName)
+extern "C" DLL_EXPORT int GetItemAsImageAtlas(int archiveID, char *imageItemName, char *subImagesItemName)
 {
 	// Get the image.
-	int memblock = GetItemAsMemblock(archiveID, itemName);
+	int memblock = GetItemAsMemblock(archiveID, imageItemName);
 	if (memblock == 0)
 	{
 		return 0;
