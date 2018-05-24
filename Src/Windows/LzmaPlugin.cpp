@@ -965,6 +965,91 @@ extern "C" DLL_EXPORT int GetItemAsImage(int archiveID, char *itemName)
 	return image;
 }
 
+void GetTempWriteFileName(char *ext, char *output)
+{
+	char path[MAX_PATH];
+	ZeroMemory(path, MAX_PATH);
+	strcpy_s(path, "lzma");
+	// Remember where hex values begin.
+	const int hexOffset = strnlen_s(path, MAX_PATH);
+	for (int x = 1; x <= MAXINT32; x++)
+	{
+		sprintf(path + hexOffset, "%08x", x);
+		strcat(path, ext);
+		if (!agk::GetFileExists(path))
+		{
+			// Chop off the extension.  Calling code should re-add it.
+			path[hexOffset + 8] = '\0';
+			strcpy(output, path);
+			return;
+		}
+	}
+}
+
+/*
+Generates an image atlas from an image item and a subimages item.
+Currently both items are extracted as files into the write folder, the image is loaded from these files, and the files are deleted.
+
+Returns an image ID or 0.
+*/
+extern "C" DLL_EXPORT int GetItemAsImageAtlas(int archiveID, char *itemName, char *subImagesItemName)
+{
+	// Get the image.
+	int memblock = GetItemAsMemblock(archiveID, itemName);
+	if (memblock == 0)
+	{
+		return 0;
+	}
+	unsigned int image = agk::CreateImageFromMemblock(memblock);
+	agk::DeleteMemblock(memblock);
+	// Get the subimage text.
+	memblock = GetItemAsMemblock(archiveID, subImagesItemName);
+	if (memblock == 0)
+	{
+		agk::DeleteImage(image);
+		return 0;
+	}
+	char *subimages = agk::GetMemblockString(memblock, 0, agk::GetMemblockSize(memblock));
+	agk::DeleteMemblock(memblock);
+	agk::GetErrorOccurred(); // Clear any error flags.
+	// Use a unique, temporary file.  Yes, this isn't completely guaranteed since an extension is appended and all that, but it should be good enough for this.
+	char base[MAX_PATH];
+	GetTempWriteFileName(".png", base);
+	std::string imageFile;
+	imageFile.append(base).append(".png");
+	std::string subimageFile;
+	subimageFile.append(base).append(" subimages.txt");
+	// Save the image and text to a file.
+	PrintS("Creating temporary image file", imageFile);
+	agk::SaveImage(image, imageFile.c_str());
+	PrintS("Creating temporary subimage file", subimageFile);
+	unsigned int fileID = agk::OpenToWrite(subimageFile.c_str());
+	if (fileID)
+	{
+		agk::WriteLine(fileID, subimages);
+		agk::CloseFile(fileID);
+	}
+	agk::DeleteImage(image);
+	agk::DeleteString(subimages);
+	if (agk::GetErrorOccurred())
+	{
+		image = 0;
+	}
+	else
+	{
+		// Load the image from the files.
+		agk::LoadImage(image, imageFile.c_str());
+		if (agk::GetErrorOccurred())
+		{
+			image = 0;
+		}
+	}
+	// Delete the temporary files.
+	agk::DeleteFile(imageFile.c_str());
+	agk::DeleteFile(subimageFile.c_str());
+	return image;
+}
+
 /*
 Get an item from the archive as an object created from a mesh.
 

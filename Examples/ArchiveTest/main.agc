@@ -45,6 +45,7 @@ SetTextSize(msgid, 20)
 #constant LOAD_STAR			6
 #constant LOAD_BIG_DATA		7
 #constant PLAY_SOUND		8
+#constant LOAD_ATLAS		9
 #constant CLEAR_ITEMS		12
 
 SetupVirtualButton(READ_NO_PW, "READ" + NEWLINE + "NO PW")
@@ -55,6 +56,7 @@ SetupVirtualButton(DELETE_ITEM, "DELETE" + NEWLINE + "ITEM")
 SetupVirtualButton(LOAD_STAR, "LOAD" + NEWLINE + "STAR")
 SetupVirtualButton(LOAD_BIG_DATA, "LOAD" + NEWLINE + "BIG DATA")
 SetupVirtualButton(PLAY_SOUND, "PLAY" + NEWLINE + "SOUND")
+SetupVirtualButton(LOAD_ATLAS, "LOAD" + NEWLINE + "ATLAS")
 SetupVirtualButton(CLEAR_ITEMS, "CLEAR" + NEWLINE + "ITEMS")
 
 Function SetupVirtualButton(id as integer, text as string)
@@ -115,6 +117,16 @@ PlayTweenChain(ballChainID)
 
 archive.AddRepeatingTweenChain(ballChainID)
 
+// Atlas/subimage testing
+global atlasImage as integer
+global atlasSubImage as integer
+global atlasSprite as integer
+atlasSprite = CreateSprite(0)
+SetSpriteSize(atlasSprite, 64, 64)
+SetSpritePosition(atlasSprite, 960, 400)
+SetSpriteVisible(atlasSprite, 0)
+
+//------------------------------------------
 
 Function ReadArchive(archiveName as string, password as string)
 	AddMessage("Reading from " + archiveName + ", password: '" + password + "'")
@@ -144,6 +156,9 @@ Function WriteArchive(archiveName as string, password as string)
 		AddMemblockString(archiveID, "readme.txt", "Readme!")
 		AddMemblockString(archiveID, "sub\test2.txt", "Subfolder test.")
 		AddMemblockString(archiveID, "sub/again.txt", "Another subfolder test.")
+		AddMessage("Add atlas.image from file: " + str(archive.SetItemFromImageFile(archiveID, "atlas.image", "atlas.png")))
+		AddMessage("Add atlas.subimages from file: " + str(archive.SetItemFromFile(archiveID, "atlas.subimages", "atlas subimages.txt")))
+
 		AddMessage("Add star.image from file: " + str(archive.SetItemFromImageFile(archiveID, "star.image", "star.png")))
 		AddMessage("Add star.sound from file: " + str(archive.SetItemFromSoundFile(archiveID, "star.sound", "zap.wav")))
 		AddMessage("Add file: " + str(archive.SetItemFromFile(archiveID, "zap.wav", "zap.wav")))
@@ -156,8 +171,6 @@ Function WriteArchive(archiveName as string, password as string)
 		//~ AddMessage("Moving file to read path: " + str(archive.MoveFileToReadPath("raw:" + GetWritePath() + GetFolder() + archiveName)))
 	endif
 EndFunction
-
-log(GetWritePath() + GetFolder() + "out.7z")
 
 Function DeleteFromArchive(archiveName as string, password as string)
 	AddMessage("Writing to " + archiveName + ", password: '" + password + "'")
@@ -243,6 +256,29 @@ Function PlayArchiveSound(archiveName as string, password as string)
 	endif
 EndFunction
 
+Function LoadAtlas(archiveName as string, password as string)
+	DeleteImage(atlasImage)
+	DeleteImage(atlasSubImage)
+	AddMessage("Reading image atlas from " + archiveName + ", password: '" + password + "'")
+	archiveID as integer
+	archiveID = archive.OpenToRead(archiveName, password)
+	AddMessage("Archive ID: " + str(archiveID))
+	SetSpriteVisible(atlasSprite, 0)
+	if archiveID
+		AddMessage("Has atlas.image: " + str(archive.HasItem(archiveID, "atlas.image")))
+		if archive.HasItem(archiveID, "atlas.image")
+			atlasImage = archive.GetItemAsImageAtlas(archiveID, "atlas.image", "atlas.subimages")
+			if atlasImage
+				AddMessage("Showing subimage '2'")
+				atlasSubImage = LoadSubImage(atlasImage, "2")
+				SetSpriteImage(atlasSprite, atlasSubImage)
+				SetSpriteVisible(atlasSprite, 1)
+			endif
+		endif
+		archive.Close(archiveID)
+	endif
+EndFunction
+
 Function ClearArchive(archiveName as string, password as string)
 	AddMessage("Clearing " + archiveName + ", password: '" + password + "'")
 	archiveID as integer
@@ -290,6 +326,9 @@ do
 	elseif GetVirtualButtonPressed(PLAY_SOUND)
 		ResetDisplay()
 		PlayArchiveSound("out.7z", "")
+	elseif GetVirtualButtonPressed(LOAD_ATLAS)
+		ResetDisplay()
+		LoadAtlas("out.7z", "")
 	elseif GetVirtualButtonPressed(CLEAR_ITEMS)
 		ResetDisplay()
 		ClearArchive("out.7z", "")

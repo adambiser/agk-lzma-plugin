@@ -10,6 +10,7 @@ HasItem,I,IS,HasItem,0,0,0,0,0
 GetItemAsMemblock,I,IS,GetItemAsMemblock,0,0,0,0,0
 ExtractItemToFile,I,ISSI,ExtractItemToFile,0,0,0,0,0
 GetItemAsImage,I,IS,GetItemAsImage,0,0,0,0,0
+GetItemAsImageAtlas,I,ISS,GetItemAsImageAtlas,0,0,0,0,0
 GetItemAsMeshObject,I,IS,GetItemAsMeshObject,0,0,0,0,0
 GetItemAsSound,I,IS,GetItemAsSound,0,0,0,0,0
 GetItemAsString,S,IS,GetItemAsString,0,0,0,0,0

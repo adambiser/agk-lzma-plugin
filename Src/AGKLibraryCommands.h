@@ -10,6 +10,9 @@
 #ifdef LoadImage
 	#undef LoadImage
 #endif
+#ifdef DeleteFile
+	#undef DeleteFile
+#endif
 
 class cImage;
 class cSprite;
@@ -105,7 +108,7 @@ extern float(*AGKCommand59)(  );
 //extern cImage*(*AGKCommand88)( unsigned int );
 //extern unsigned int(*AGKCommand89)( unsigned int );
 //extern void(*AGKCommand90)( unsigned int, const char *, int );
-//extern void(*AGKCommand91)( unsigned int, const char* );
+extern void(*AGKCommand91)( unsigned int, const char* );
 //extern unsigned int(*AGKCommand92)( const char*, int );
 extern unsigned int(*AGKCommand93)( const char* );
 //extern void(*AGKCommand94)( unsigned int, unsigned int, const char * );
@@ -127,7 +130,7 @@ extern void(*AGKCommand103)( unsigned int );
 //extern void(*AGKCommand110)( unsigned int, unsigned int );
 //extern void(*AGKCommand111)( unsigned int, unsigned int, int, int, int, int );
 //extern void(*AGKCommand112)( unsigned int, int, int, int );
-//extern void(*AGKCommand113)( unsigned int, const char* );
+extern void(*AGKCommand113)( unsigned int, const char* );
 //extern unsigned int(*AGKCommand114)( float, float, float, float );
 //extern void(*AGKCommand115)( unsigned int, float, float, float, float );
 //extern char*(*AGKCommand116)( unsigned int );
@@ -737,7 +740,7 @@ extern void(*AGKCommand670)( unsigned int );
 //extern void(*AGKCommand720)( const char* );
 //extern void(*AGKCommand721)(  );
 //extern int(*AGKCommand722)(  );
-//extern void(*AGKCommand723)( const char * );
+extern void(*AGKCommand723)( const char * );
 extern int(*AGKCommand724)( const char * );
 //extern char*(*AGKCommand725)( const char* );
 //extern char*(*AGKCommand726)( const char*, int );
@@ -755,11 +758,11 @@ extern int(*AGKCommand724)( const char * );
 //extern void(*AGKCommand738)( unsigned int, const char *, int );
 //extern void(*AGKCommand739)( unsigned int, const char * );
 //extern unsigned int(*AGKCommand740)( const char *, int );
-//extern unsigned int(*AGKCommand741)( const char * );
+extern unsigned int(*AGKCommand741)( const char * );
 //extern unsigned int(*AGKCommand742)( const char * );
 //extern void(*AGKCommand743)( unsigned int, const char * );
 //extern int(*AGKCommand744)( unsigned int );
-//extern void(*AGKCommand745)( unsigned int );
+extern void(*AGKCommand745)( unsigned int );
 //extern int(*AGKCommand746)( unsigned int );
 //extern int(*AGKCommand747)( unsigned int );
 //extern int(*AGKCommand748)( unsigned int );
@@ -769,7 +772,7 @@ extern int(*AGKCommand724)( const char * );
 //extern void(*AGKCommand752)( unsigned int, float );
 //extern void(*AGKCommand753)( unsigned int, const char* );
 //extern void(*AGKCommand754)( unsigned int, const char* );
-//extern void(*AGKCommand755)( unsigned int, const char* );
+extern void(*AGKCommand755)( unsigned int, const char* );
 //extern int(*AGKCommand756)( unsigned int );
 //extern int(*AGKCommand757)( unsigned int );
 //extern float(*AGKCommand758)( unsigned int );
@@ -2048,7 +2051,7 @@ class agk
 		//static inline cImage* GetImagePtr( unsigned int iImageIndex ) { return AGKCommand88( iImageIndex ); }
 		//static inline unsigned int GetImageTextureID( unsigned int iImageIndex ) { return AGKCommand89( iImageIndex ); }
 		//static inline void LoadImage( unsigned int iImageIndex, const char * sImageFilename, int bBlackToAlpha ) { AGKCommand90( iImageIndex, sImageFilename, bBlackToAlpha ); }
-		//static inline void LoadImage( unsigned int ID, const char* sImageFilename ) { AGKCommand91( ID, sImageFilename ); }
+		static inline void LoadImage( unsigned int ID, const char* sImageFilename ) { AGKCommand91( ID, sImageFilename ); }
 		//static inline unsigned int LoadImage( const char* sImageFilename, int bBlackToAlpha ) { return AGKCommand92( sImageFilename, bBlackToAlpha ); }
 		static inline unsigned int LoadImage( const char* sImageFilename ) { return AGKCommand93( sImageFilename ); }
 		//static inline void LoadSubImage( unsigned int iImageIndex, unsigned int iParentIndex, const char * sImageFilename ) { AGKCommand94( iImageIndex, iParentIndex, sImageFilename ); }
@@ -2070,7 +2073,7 @@ class agk
 		//static inline void SetImageWrapV( unsigned int iImageIndex, unsigned int mode ) { AGKCommand110( iImageIndex, mode ); }
 		//static inline void SetImageMask( unsigned int iDstImage, unsigned int iSrcImage, int dst, int src, int x, int y ) { AGKCommand111( iDstImage, iSrcImage, dst, src, x, y ); }
 		//static inline void SetImageTransparentColor( unsigned int iImage, int r, int g, int b ) { AGKCommand112( iImage, r, g, b ); }
-		//static inline void SaveImage( unsigned int iImageIndex, const char* filename ) { AGKCommand113( iImageIndex, filename ); }
+		static inline void SaveImage( unsigned int iImageIndex, const char* filename ) { AGKCommand113( iImageIndex, filename ); }
 		//static inline unsigned int GetImage( float x, float y, float width, float height ) { return AGKCommand114( x, y, width, height ); }
 		//static inline void GetImage( unsigned int imageID, float x, float y, float width, float height ) { AGKCommand115( imageID, x, y, width, height ); }
 		//static inline char* GetImageFilename( unsigned int imageID ) { return AGKCommand116( imageID ); }
@@ -2680,7 +2683,7 @@ class agk
 		//static inline void RecordSound( const char* szFilename ) { AGKCommand720( szFilename ); }
 		//static inline void StopSoundRecording(  ) { AGKCommand721(  ); }
 		//static inline int IsSoundRecording(  ) { return AGKCommand722(  ); }
-		//static inline void DeleteFile( const char * szFile ) { AGKCommand723( szFile ); }
+		static inline void DeleteFile( const char * szFile ) { AGKCommand723( szFile ); }
 		static inline int GetFileExists( const char * szFile ) { return AGKCommand724( szFile ); }
 		//static inline char* ChooseRawFile( const char* ext ) { return AGKCommand725( ext ); }
 		//static inline char* ChooseRawFile( const char* ext, int returnFullPath ) { return AGKCommand726( ext, returnFullPath ); }
@@ -2698,11 +2701,11 @@ class agk
 		//static inline void OpenToWrite( unsigned int ID, const char * szFile, int append ) { AGKCommand738( ID, szFile, append ); }
 		//static inline void OpenToWrite( unsigned int ID, const char * szFile ) { AGKCommand739( ID, szFile ); }
 		//static inline unsigned int OpenToWrite( const char * szFile, int append ) { return AGKCommand740( szFile, append ); }
-		//static inline unsigned int OpenToWrite( const char * szFile ) { return AGKCommand741( szFile ); }
+		static inline unsigned int OpenToWrite( const char * szFile ) { return AGKCommand741( szFile ); }
 		//static inline unsigned int OpenToRead( const char * szFile ) { return AGKCommand742( szFile ); }
 		//static inline void OpenToRead( unsigned int ID, const char * szFile ) { AGKCommand743( ID, szFile ); }
 		//static inline int FileIsOpen( unsigned int iFileID ) { return AGKCommand744( iFileID ); }
-		//static inline void CloseFile( unsigned int iFileID ) { AGKCommand745( iFileID ); }
+		static inline void CloseFile( unsigned int iFileID ) { AGKCommand745( iFileID ); }
 		//static inline int FileEOF( unsigned int iFileID ) { return AGKCommand746( iFileID ); }
 		//static inline int GetFileSize( unsigned int iFileID ) { return AGKCommand747( iFileID ); }
 		//static inline int GetFilePos( unsigned int iFileID ) { return AGKCommand748( iFileID ); }
@@ -2712,7 +2715,7 @@ class agk
 		//static inline void WriteFloat( unsigned int iFileID, float f ) { AGKCommand752( iFileID, f ); }
 		//static inline void WriteString( unsigned int iFileID, const char* str ) { AGKCommand753( iFileID, str ); }
 		//static inline void WriteString2( unsigned int iFileID, const char* str ) { AGKCommand754( iFileID, str ); }
-		//static inline void WriteLine( unsigned int iFileID, const char* str ) { AGKCommand755( iFileID, str ); }
+		static inline void WriteLine( unsigned int iFileID, const char* str ) { AGKCommand755( iFileID, str ); }
 		//static inline int ReadByte( unsigned int iFileID ) { return AGKCommand756( iFileID ); }
 		//static inline int ReadInteger( unsigned int iFileID ) { return AGKCommand757( iFileID ); }
 		//static inline float ReadFloat( unsigned int iFileID ) { return AGKCommand758( iFileID ); }
